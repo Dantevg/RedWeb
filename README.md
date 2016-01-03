@@ -3,14 +3,24 @@ RedWeb is a program, which lets you access webpages all around your world. It wo
 ***RedWeb is still under comnstruction. Please come back later.***
 
 ### Installation
-For RedWeb, you will need at least 3 computers with wireless modems.
+For RedWeb, you will need at least 3 computers with wireless modems.  
+Scheme:
+```
+Client 1  -----|                 |-----  Webserver 1
+               |                 |
+Client 2  -----+-----  IDS  -----+-----  Webserver 2
+               |                 |
+Client 3  -----|                 |-----  Webserver 3
+...            |                 |       ...
+    1                   2                     3
+```
 
 - **Computer 1:**  
-  These are the clients.  
+  These are the clients. An advanced computer and DvgFiles are required.  
   *Pastebin coming soon.*
 
 - **Computer 2:**  
-  This is the IDS (ID server). It is comparable with an DNS server in real-life and there is only one of it needed.  
+  This is the IDS (ID Server). It is comparable with an DNS server in real-life and there is only one of it.  
   *Pastebin coming soon.*
 
 - **Computer 3:**  
