@@ -28,7 +28,7 @@ Client 3  -----|                 |-----  Webserver 3
 
 - **Computer 3:**  
   These are the webservers. One webserver can have multiple domains hosted, that are registered on the IDS.  
-  **How to use:** Open the server program and click `START`, in the bottom-left corner.  
+  **How to use:** Open the server program and click `START`, in the bottom-right corner.  
   *Pastebin coming soon.*
 
 ### Create a website
