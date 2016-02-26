@@ -32,7 +32,7 @@ Client 3  -----|                 |-----  Webserver 3
   *Pastebin coming soon.*
 
 ### Create a website
-Run the server software on a server computer. Click on the `=` in the top-left corner, and click register.  
-Insert the desired domain name (with domain extension, like `.cc`), and insert the path to the base folder, like `/domains/mywebsite.mc` or `/disk/files`.
+Run the server software on a server computer. Click register in the top-right corner.  
+Type the desired domain name (with domain extension, like `.cc`), and type the path to the base folder, like `/domains/mywebsite.mc` or `/disk/files`.
 
 Then, the first page to add is `index` or `index.lua`. As you can see by the extension, the files are **just lua programs**. Therefore, **you should not use this in a server**, only for personal use. It is way too easy to take over a computer this way (like adding/changing the startup file :wink:)
