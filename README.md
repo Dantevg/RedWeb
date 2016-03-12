@@ -1,7 +1,7 @@
 # RedWeb
 RedWeb is a program, which lets you access webpages all around your world. It works a bit like the World Wide Web. A webpage is just a normal lua file, unlike others (quest, firewolf...).  
 ***RedWeb works with lua programs. Therefore you should not use this on a server (because of hacking etc.)***  
-***RedWeb is still under construction. It should be ready 1st ~~February~~ March.***
+***RedWeb is still under construction. It should be ready ~~1st~~ ~~February~~ ~~March~~ end april.***
 
 ### Installation
 For RedWeb, you will need at least 3 computers with wireless modems.  
