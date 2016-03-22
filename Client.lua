@@ -6,8 +6,8 @@
       Wireless modem and server required
 
       VERSION 1.0
-      LONG V  0.9.6 (server 0.9.7, IDS 0.9.5)
-      DATE    16-03-2016
+      LONG V  0.9.8 (server 0.9.7, IDS 0.9.5)
+      DATE    22-03-2016
 
       Protocols:
       - redweb://
@@ -98,6 +98,21 @@ function getWebpage()
 
   elseif protocol == "app" then
 
+    local _,_, app, path = url:find( "([^/]+)([^%?]*)" ) -- doma.in / path/to/file
+    if fs.isDir( "/.DvgFiles/data/"..app ) then
+      if path and path ~= "" then -- No path specified
+        if fs.exists( "/.DvgFiles/data/"..app.."/"..app ) then -- /data/{name}/{name}
+          shell.run( "/.DvgFiles/data/"..app.."/"..app )
+        elseif fs.exists( "/.DvgFiles/data/"..app.."/run" ) then -- /data/{name}/run
+          shell.run( "/.DvgFiles/data/"..app.."/run" )
+        end
+      else -- Path specified
+        if fs.exists( "/.DvgFiles/data/"..app.."/"..path ) then
+          shell.run( "/.DvgFiles/data/"..app.."/"..path )
+        end
+      end
+    end
+
   end --End if protocol
 end
 
@@ -125,10 +140,9 @@ if not fs.exists( "/.DvgFiles" ) then
   error( "You have to install DvgFiles first." )
 end
 
-local file = fs.open( "/.DvgFiles/settings/mside", "r" )
-local mside = file.readAll()
-file.close()
-rednet.open( mside )
+for i = 1, #dvg.sides do -- Open modems on all sides
+  rednet.open( sides[i] )
+end
 
 local file = fs.open( path.."/settings.cfg", "r" )
 s = textutils.unserialize( file.readAll() )
@@ -156,7 +170,7 @@ while running do
     term.setTextColor( c.inputtxt )
     input = read()
     _, _, protocol, url = string.find( input, "(%a+)://(.+)" )
-    if not url then _, _, protocol, url = "web", string.find( input, "(.+)" ) end
+    if not url then protocol, _, _, url = "web", string.find( input, "(.+)" ) end
     doWebpage()
 
   end
