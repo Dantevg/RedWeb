@@ -7,7 +7,7 @@
 
       VERSION 1.0
       LONG V  0.9.8 (server 0.9.7, IDS 0.9.5)
-      DATE    22-03-2016
+      DATE    24-03-2016
 
       Protocols:
       - redweb://
@@ -17,6 +17,7 @@
 --]]
 
 -- Variables
+local arg = {...}
 local path = "/.DvgFiles/data/RedWeb"
 local running = true
 
@@ -39,7 +40,16 @@ local url = "home"
 local args = ""
 local webpage = ""
 
+local returnVal = {}
+
 -- Functions
+function separate( url )
+  _, _, protocol, url = string.find( url, "(%a+)://(.+)" ) -- protocol :// url
+  if not url then
+    protocol, _, _, url = "web", string.find( url, "(.+)" )
+  end
+end
+
 function mainInterface()
   term.setTextColor( c.maintxt )
   dvg.bg( c.mainbg )
@@ -72,7 +82,7 @@ function getWebpage()
   if protocol == "redweb" then
 
     if url == "home" then
-      return ""
+      return "" -- run itself redweb://home
     elseif url == "settings" then
       shell.run( path.."/settings" )
       return ""
@@ -122,7 +132,7 @@ function doWebpage()
 
   fWebpage = loadstring( webpage )
   local function runWebpage()
-    fWebpage()
+    returnVal = {fWebpage()}
   end
   local function getExit()
     while true do
@@ -136,10 +146,6 @@ function doWebpage()
 end
 
 -- Run
-if not fs.exists( "/.DvgFiles" ) then
-  error( "You have to install DvgFiles first." )
-end
-
 for i = 1, #dvg.sides do -- Open modems on all sides
   rednet.open( sides[i] )
 end
@@ -147,6 +153,12 @@ end
 local file = fs.open( path.."/settings.cfg", "r" )
 s = textutils.unserialize( file.readAll() )
 file.close()
+
+if #arg > 0 then
+  separate( arg[1] )
+  doWebpage()
+  return returnVal
+end
 
 while running do
   mainInterface()
@@ -169,9 +181,9 @@ while running do
     term.setCursorPos( 7,10 )
     term.setTextColor( c.inputtxt )
     input = read()
-    _, _, protocol, url = string.find( input, "(%a+)://(.+)" )
-    if not url then protocol, _, _, url = "web", string.find( input, "(.+)" ) end
+    separate( input )
     doWebpage()
 
   end
 end
+return returnVal
