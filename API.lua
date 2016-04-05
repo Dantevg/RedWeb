@@ -3,8 +3,8 @@
       RedWeb (rw) API
       by DvgCraft
 
-      VERSION  0.9.10
-      DATE     04-04-2016
+      VERSION  0.9.10.3
+      DATE     05-04-2016
 
 ]]--
 
@@ -18,6 +18,8 @@
        web     ://  bank.cc  /  files/usr/john   doThis
 ]]--
 
+-- Variables
+path = "/.DvgFiles/data/RedWeb"
 
 -- Functions
 function separate( url, getPath )
@@ -43,7 +45,7 @@ function getWebpage( protocol, url )
   if protocol == "redweb" then
 
     if url == "home" then
-      local file = fs.open( path.."/home", "r" )
+      local file = fs.open( path.."/RedWeb", "r" )
       webpage = file.readAll()
       file.close()
       return webpage, true
@@ -106,6 +108,8 @@ function doWebpage( webpage )
   local goto = ""
 
   local function runWebpage()
+    term.setBackgroundColor( colors.white )
+    term.clear()
     goto = fWebpage()
   end
 
@@ -117,7 +121,7 @@ function doWebpage( webpage )
       end
     end
   end
-  
+
   parallel.waitForAny( getExit, runWebpage )
   return goto
 end
