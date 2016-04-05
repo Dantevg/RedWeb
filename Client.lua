@@ -8,8 +8,8 @@
       - Advanced computer
       - IDS and webserver
 
-      VERSION  0.9.10.1
-      DATE     04-04-2016
+      VERSION  0.9.10.2
+      DATE     05-04-2016
 
       Protocols:
       - redweb://
@@ -32,8 +32,8 @@ local c = {
 }
 
 local error = ""
-local protocol = ""
-local url = ""
+local protocol = "redweb"
+local url = "home"
 local goto = ""
 
 -- Functions
@@ -73,9 +73,7 @@ function handleInput( input )
 end
 
 -- Run
-for i = 1, #dvg.sides do -- Open modems on all sides
-  rednet.open( dvg.sides[i] )
-end
+dvg.openRednet()
 
 local file = fs.open( path.."/settings.cfg", "r" ) -- Open settings and save in global var
 rwSettings = textutils.unserialize( file.readAll() )
@@ -95,7 +93,7 @@ while running do
         term.clear()
         term.setCursorPos( 1,1 )
       elseif x >= 27 and x <= 34 then
-        rw.doWebpage( "redweb", "settings" )
+        handleInput( "redweb://settings" )
       end
 
     elseif y == 10 and x >= 6 and x <= 46 then
@@ -104,7 +102,7 @@ while running do
       term.setCursorPos( 7,10 )
       term.setTextColor( c.inputtxt )
       input = read()
-      handleInput( input )
+      goto = handleInput( input )
     end -- End if y
 
   end -- End if goto
