@@ -8,7 +8,7 @@
       - Advanced computer
       - IDS and webserver
 
-      VERSION  0.9.10.2
+      VERSION  0.9.10.3
       DATE     05-04-2016
 
       Protocols:
@@ -76,7 +76,7 @@ end
 dvg.openRednet()
 
 local file = fs.open( path.."/settings.cfg", "r" ) -- Open settings and save in global var
-rwSettings = textutils.unserialize( file.readAll() )
+_G["rwSettings"] = textutils.unserialize( file.readAll() )
 file.close()
 
 while running do
