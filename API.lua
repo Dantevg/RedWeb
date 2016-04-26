@@ -3,8 +3,8 @@
       RedWeb (rw) API
       by DvgCraft
 
-      VERSION  0.9.10.3
-      DATE     05-04-2016
+      VERSION  0.9.14
+      DATE     25-04-2016
 
 ]]--
 
@@ -27,36 +27,23 @@ function separate( url, getPath )
     local _,_, domain, path, args = string.find( url, "([^/]+)(%S*)(.*)" ) -- doma.in / path/to/file arg1 arg2
     return domain, path, args:sub( 2 )
   else
-    local _,_, protocol, url = string.find( url, "(%a+)://(.+)" ) -- protocol :// url
-    if not url then
-      local protocol, _,_, url = "web", string.find( url, "(.+)" ) -- url
+    local _,_, protocol, newUrl = string.find( url, "(%a+)://(.+)" ) -- protocol :// url
+    if not newUrl then
+      return "web", url
+    else
+      return protocol, newUrl
     end
-    return protocol, url
   end
 end
 
 function getWebpage( protocol, url )
-  if protocol ~= "redweb" and protocol ~= "web" and protocol ~= "app" then
-    return "Invalid protocol. (redweb, web, app)", false
+  if protocol ~= "web" and protocol ~= "app" then
+    return "Invalid protocol. (web, app)", false
   end
 
   local webpage = ""
 
-  if protocol == "redweb" then
-
-    if url == "home" then
-      local file = fs.open( path.."/RedWeb", "r" )
-      webpage = file.readAll()
-      file.close()
-      return webpage, true
-    elseif url == "settings" then
-      local file = fs.open( path.."/settings", "r" )
-      webpage = file.readAll()
-      file.close()
-      return webpage, true
-    end
-
-  elseif protocol == "web" then
+  if protocol == "web" then
 
     rednet.broadcast( url, "DVG_REDWEB_IDS_REQUEST" )
     local ID, webServer = rednet.receive( "DVG_REDWEB_IDS_ANSWER", 1 )
@@ -105,12 +92,18 @@ end
 
 function doWebpage( webpage )
   fWebpage = loadstring( webpage )
-  local goto = ""
+  local goto, err = "", ""
 
   local function runWebpage()
-    term.setBackgroundColor( colors.white )
-    term.clear()
-    goto = fWebpage()
+    if rwSettings.protectFs.val == true then
+      oldMakeDir, oldMove, oldCopy, oldDelete, oldOpen = fs.makeDir, fs.move, fs.copy, fs.delete, fs.open
+      fs.makeDir, fs.move, fs.copy, fs.delete = nil
+      fs.open = function( path, mode ) if mode~="r" and mode~="rb" then return nil else return oldOpen(path,mode) end end
+    end
+    status, goto = pcall( fWebpage )
+    if rwSettings.protectFs.val == true then
+      fs.makeDir, fs.move, fs.copy, fs.delete, fs.open = oldMakeDir, oldMove, oldCopy, oldDelete, oldOpen
+    end
   end
 
   local function getExit()
@@ -123,5 +116,9 @@ function doWebpage( webpage )
   end
 
   parallel.waitForAny( getExit, runWebpage )
-  return goto
+  if status then
+    return goto, true
+  else
+    return goto, false
+  end
 end
