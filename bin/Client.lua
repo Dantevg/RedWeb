@@ -8,8 +8,8 @@
       - Advanced computer
       - IDS and webserver
 
-      VERSION  0.9.13.4
-      DATE     26-04-2016
+      VERSION  0.9.13.5
+      DATE     27-04-2016
 
       Protocols:
       - app://
@@ -121,12 +121,12 @@ function handleInput( input )
 end
 
 -- Run
-if dvg.version < "2.15.2" then
-  print( "Please update dvg API v"..dvg.version.." to at least v2.15.2" )
+if dvg.version < "2.15.3" then
+  print( "Please update dvg API v"..dvg.version.." to at least v2.15.3" )
   print( "Update now? y/n" )
   input = read():lower()
   if input == "y" then
-    shell.run( "/.DvgFiles/update" )
+    shell.run( "/.DvgFiles/update dvg" )
   else
     return
   end
