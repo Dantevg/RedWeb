@@ -6,8 +6,8 @@
       Wireless modem required
 
       VERSION 1.0
-      LONG V  0.9.5 (client 0.9.6, server 0.9.7)
-      DATE    06-03-2016
+      LONG V  0.9.7
+      DATE    27-04-2016
 
 ]]--
 
@@ -41,29 +41,39 @@ print()
 while true do
   domain = ""
   id, msg, code = rednet.receive()
-  if code:sub( 1,14 ) == "DVG_REDWEB_IDS" then -- For us
+  if string.sub( code, 1,14 ) == "DVG_REDWEB_IDS" then -- For us
 
     if code == "DVG_REDWEB_IDS_REQUEST" then -- Request server ID
       print( "LOG  Getting IDS Request from "..id )
       _,_,domain = msg:find( "([^/]+)" ) -- domain.name / ...
       if database[domain] then
-        rednet.send( id, database[domain], "DVG_REDWEB_IDS_ANSWER" )
-        print( "LOG  Returning ID "..database[domain].." from "..msg )
+        rednet.send( id, database[domain].id, "DVG_REDWEB_IDS_ANSWER" )
+        print( "LOG  Returning ID "..database[domain].id.." of "..msg )
       else
         rednet.send( id, "Domain does not exist", "DVG_REDWEB_IDS_ANSWER" )
         print( "LOG  Can't find ID for "..msg )
       end
     elseif code == "DVG_REDWEB_IDS_REGISTER_REQUEST" then -- Register process
-      print( "LOG  Getting register request.\n     ID:     "..id.."\n     Domain: "..msg )
-      if not database[msg] then
-        database[msg] = id
+      print( "LOG  Getting register request.\n     ID:      "..id.."\n     Domain:  "..msg.domain.."\n     Company: "..msg.company )
+      if not database[msg.domain] then
+        database[msg.domain] = { id=id, company=msg.company, date=os.day(), info=msg.info }
         rednet.send( id, true, "DVG_REDWEB_IDS_REGISTER_ANSWER" )
-        print( "LOG  Registered "..msg.." for "..id )
+        print( "LOG  Registered "..msg.domain.." for "..id )
       else
         rednet.send( id, "Domain already taken", "DVG_REDWEB_IDS_REGISTER_ANSWER" )
         print( "LOG  Requested domain register already taken" )
       end
-    end
+    elseif code == "DVG_REDWEB_IDS_REMOVE_REQUEST" then -- Domain remove
+      print( "LOG  Getting remove request from "..id.." for "..msg )
+      if database[msg] then
+        database[msg] = nil
+        rednet.send( id, true, "DVG_REDWEB_IDS_REMOVE_ANSWER" )
+        print( "LOG  Removed "..msg.." for "..id )
+      else
+        rednet.send( id, "Domain does not exist", "DVG_REDWEB_IDS_REMOVE_ANSWER" )
+        print( "LOG  Requested domain to remove does not exist" )
+      end
+    end -- End if code
 
   end
   saveDb()
