@@ -19,7 +19,7 @@ Client 3  -----|                 |-----  Webserver 3
 - **Computer 1:**  
   These are the clients. An advanced computer and DvgFiles are required.  
   **How to use:** Run RedWeb and insert a URL, like: `web://website.cc/page`.  
-  *Pastebin coming soon.*
+  **Pastebin:** `KA29CCek`
 
 - **Computer 2:**  
   This is the IDS (ID Server). It is comparable with an DNS server in real-life and there is only one of it.  
@@ -28,7 +28,7 @@ Client 3  -----|                 |-----  Webserver 3
 
 - **Computer 3:**  
   These are the webservers. One webserver can have multiple domains hosted, that are registered on the IDS.  
-  **How to use:** Open the server program. It will automatically start to run the server, excepf if specified in command line (`-nostart`)  
+  **How to use:** Open the server program. It will automatically start to run the server. After the first register, it will create a file `server.cfg` \. To change the location, edit the file and change line 18 (`local serverPath`) to where you want it.
   *Pastebin coming soon.*
 
 ### Create a website
