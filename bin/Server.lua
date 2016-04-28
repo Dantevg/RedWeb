@@ -6,13 +6,13 @@
       Wireless modem required
 
       VERSION 1.0
-      LONG V  0.9.11
+      LONG V  0.9.12
       DATE    27-04-2016
 
 ]]--
 
 -- Variables
-local tArgs = {...}
+local arg = {...}
 local running = true
 
 local serverPath = "/server.cfg"
@@ -448,9 +448,11 @@ function handleClick( x, y )
 end
 
 -- Run
-local file = fs.open( assert( fs.exists(serverPath) and serverPath or false, "No such server.cfg file: "..serverPath ), "r" )
-domains = assert( textutils.unserialize( assert(file.readAll(),"Could not read server.cfg") ), "Corrupt server.cfg" )
-file.close()
+if fs.exists( serverPath ) then
+  local file = fs.open( serverPath, "r" )
+  domains = assert( textutils.unserialize( assert(file.readAll(),"Could not read server.cfg") ), "Invalid server.cfg" )
+  file.close()
+end
 
 table.insert( log, "LOG  Starting server" )
 
