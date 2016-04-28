@@ -8,8 +8,8 @@
       - Advanced computer
       - IDS and webserver
 
-      VERSION  0.9.13.5
-      DATE     27-04-2016
+      VERSION  0.9.13.6
+      DATE     28-04-2016
 
       Protocols:
       - app://
@@ -127,9 +127,17 @@ if dvg.version < "2.15.3" then
   input = read():lower()
   if input == "y" then
     shell.run( "/.DvgFiles/update dvg" )
-  else
-    return
   end
+  os.reboot()
+end
+if not dvgapps then
+  print( "Dvgapps API required" )
+  print( "Install now? y/n" )
+  input = read:lower()
+  if input == "y" then
+    shell.run( "/.DvgFiles/update dvgapps" )
+  end
+  os.reboot()
 end
 dvg.openRednet()
 
