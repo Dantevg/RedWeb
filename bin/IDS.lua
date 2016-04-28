@@ -6,13 +6,13 @@
       Wireless modem required
 
       VERSION 1.0
-      LONG V  0.9.7
+      LONG V  0.9.8
       DATE    27-04-2016
 
 ]]--
 
 -- Variables
-local dbPath = "database.db"
+local dbPath = "/disk/RedWeb/database.db"
 
 local database = {}
 local domain = ""
@@ -31,11 +31,13 @@ write( "Starting host... " )
 rednet.host( "DVG_REDWEB", "IDS" )
 print( "Done." )
 
-write( "Loading database... " )
-local file = assert( fs.open( dbPath, "r" ), "Could not find database on path: "..dbPath )
-database = assert( textutils.unserialize( assert(file.readAll(),"Fail.\nCould not read database.") ), "Fail.\nCorrupt database." )
-file.close()
-print( "Done." )
+if fs.exists( dbPath ) then
+  write( "Loading database... " )
+  local file = assert( fs.open( dbPath, "r" ), "Could not find database on path: "..dbPath )
+  database = assert( textutils.unserialize( assert(file.readAll(),"Fail.\nCould not read database.") ), "Fail.\nCorrupt database." )
+  file.close()
+  print( "Done." )
+end
 print()
 
 while true do
