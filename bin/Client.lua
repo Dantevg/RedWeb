@@ -133,7 +133,7 @@ end
 if not dvgapps then
   print( "Dvgapps API required" )
   print( "Install now? y/n" )
-  input = read:lower()
+  input = read():lower()
   if input == "y" then
     shell.run( "/.DvgFiles/update dvgapps" )
   end
