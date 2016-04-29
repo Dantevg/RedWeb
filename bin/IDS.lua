@@ -12,7 +12,7 @@
 ]]--
 
 -- Variables
-local dbPath = "/disk/RedWeb/database.db"
+local dbPath = "database.db"
 
 local database = {}
 local domain = ""
