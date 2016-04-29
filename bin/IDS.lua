@@ -6,8 +6,8 @@
       Wireless modem required
 
       VERSION 1.0
-      LONG V  0.9.8
-      DATE    27-04-2016
+      LONG V  0.9.9
+      DATE    29-04-2016
 
 ]]--
 
@@ -33,7 +33,7 @@ print( "Done." )
 
 if fs.exists( dbPath ) then
   write( "Loading database... " )
-  local file = assert( fs.open( dbPath, "r" ), "Could not find database on path: "..dbPath )
+  local file = assert( fs.open( dbPath, "r" ), "Could not open database on path: "..dbPath )
   database = assert( textutils.unserialize( assert(file.readAll(),"Fail.\nCould not read database.") ), "Fail.\nCorrupt database." )
   file.close()
   print( "Done." )
@@ -47,7 +47,8 @@ while true do
 
     if code == "DVG_REDWEB_IDS_REQUEST" then -- Request server ID
       print( "LOG  Getting IDS Request from "..id )
-      _,_,domain = msg:find( "([^/]+)" ) -- domain.name / ...
+      _,_,domain =  msg:find( "([^/]+)" ) -- domain.name / ...
+      domain = string.lower( domain )
       if database[domain] then
         rednet.send( id, database[domain].id, "DVG_REDWEB_IDS_ANSWER" )
         print( "LOG  Returning ID "..database[domain].id.." of "..msg )
@@ -56,6 +57,7 @@ while true do
         print( "LOG  Can't find ID for "..msg )
       end
     elseif code == "DVG_REDWEB_IDS_REGISTER_REQUEST" then -- Register process
+      msg.domain = string.lower( msg.domain )
       print( "LOG  Getting register request.\n     ID:      "..id.."\n     Domain:  "..msg.domain.."\n     Company: "..msg.company )
       if not database[msg.domain] then
         database[msg.domain] = { id=id, company=msg.company, date=os.day(), info=msg.info }
@@ -66,6 +68,7 @@ while true do
         print( "LOG  Requested domain register already taken" )
       end
     elseif code == "DVG_REDWEB_IDS_REMOVE_REQUEST" then -- Domain remove
+      msg = string.lower( msg )
       print( "LOG  Getting remove request from "..id.." for "..msg )
       if database[msg] then
         database[msg] = nil
@@ -79,5 +82,7 @@ while true do
 
   end
   saveDb()
+  print()
   print( "LOG  Saving Database" )
+  print()
 end
