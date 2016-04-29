@@ -6,7 +6,7 @@
       Wireless modem required
 
       VERSION 1.0
-      LONG V  0.9.12.1
+      LONG V  0.9.12.2
       DATE    29-04-2016
 
 ]]--
@@ -375,9 +375,13 @@ function webpage( info )
 
   if not fs.exists( domains[info.domain].."/"..info.path ) then --Does not exist
     local _,_, ext = string.find( info.path, "%w+(%.+%w+)" )
-    if ext ~= nil and ext ~= "" then
+    if ext == nil or ext == "" then
       if fs.exists( domains[info.domain].."/"..info.path..".lua" ) then
-        info.path = "index.lua"
+        info.path = info.path..".lua"
+        local file = fs.open( domains[info.domain].."/"..info.path, "r" )
+        rednet.send( info.ID, file.readAll(), "DVG_REDWEB_WEBSITE_ANSWER" )
+        table.insert( log, "LOG  Sent "..info.domain.."/"..info.path.." to ID "..info.ID )
+        file.close()
       else
         rednet.send( info.ID, "ERR URL not found", "DVG_REDWEB_WEBSITE_ANSWER" )
         table.insert( log, "LOG  URL not found" )
