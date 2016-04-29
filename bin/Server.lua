@@ -6,8 +6,8 @@
       Wireless modem required
 
       VERSION 1.0
-      LONG V  0.9.12
-      DATE    27-04-2016
+      LONG V  0.9.12.1
+      DATE    29-04-2016
 
 ]]--
 
@@ -298,6 +298,8 @@ function notify( txt )
   print( string.rep( " ", w ) )
   print( string.rep( " ", w ) )
   center( txt, 10 )
+  term.setBackgroundColor( c.bg )
+  term.setTextColor( c.txt )
 end
 
 -- Operating Functions
@@ -342,7 +344,7 @@ function sendRegister()
     file.write( textutils.serialize( domains ) )
     file.close()
     notify( "Registered "..input[1].." in folder "..input[2] )
-    os.pullevent()
+    os.pullEvent( "key" )
   end
 end
 function sendRemove( name )
@@ -363,7 +365,7 @@ function sendRemove( name )
       file.write( textutils.serialize( domains ) )
       file.close()
       notify( "Removed "..name.." from folder "..path )
-      os.pullEvent()
+      os.pullEvent( "key" )
     end
   end
 end
