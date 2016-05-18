@@ -8,12 +8,13 @@
       - Advanced computer
       - IDS and webserver
 
-      VERSION  0.9.13.6
-      DATE     28-04-2016
+      VERSION  0.9.14.1
+      DATE     18-05-2016
 
       Protocols:
       - app://
       - web://
+      - search://
 
 ]]--
 
@@ -40,17 +41,52 @@ local url = ""
 local goto = ""
 
 -- Functions
+local function receive( sProtocolFilter, nTimeout ) -- From rednet API
+    -- The parameters used to be ( nTimeout ), detect this case for backwards compatibility
+    if type(sProtocolFilter) == "number" and nTimeout == nil then
+        sProtocolFilter, nTimeout = nil, sProtocolFilter
+    end
+
+    -- Start the timer
+	local timer = nil
+	local sFilter = nil
+	if nTimeout then
+		timer = os.startTimer( nTimeout )
+		sFilter = nil
+	else
+		sFilter = "rednet_message"
+	end
+
+	-- Wait for events
+	while true do
+		local sEvent, p1, p2, p3 = os.pullEvent( sFilter )
+		if sEvent == "rednet_message" then
+		    -- Return the first matching rednet_message
+			local nSenderID, message, sProtocol = p1, p2, p3
+			if sProtocolFilter == nil or sProtocol == sProtocolFilter then
+          os.cancelTimer( timer )
+    			return nSenderID, message, sProtocol
+    	    end
+		elseif sEvent == "timer" then
+		    -- Return nil if we timeout
+		    if p1 == timer then
+    			return nil
+    		end
+		end
+	end
+end
+
 function mainInterface()
   term.setTextColor( c.maintxt )
   dvg.bg( c.mainbg )
-  dvg.center( "RedWeb browser", 7 )
-  dvg.center( "EXIT     SETTINGS", 14 )
+  dvg.center( "RedWeb browser", 5 )
+  dvg.center( "EXIT     SETTINGS", 16 )
   dvg.center( "While in webpage view, press "..rwSettings.exitKey.val.." to exit", 19 )
 
   term.setBackgroundColor( c.inputbg )
-  dvg.center( "                                         ", 10 )
+  dvg.center( "                                         ", 9 )
 
-  term.setCursorPos( 7,10 )
+  term.setCursorPos( 7,9 )
   term.setBackgroundColor( c.inputbg )
   term.setTextColor( c.sinputtxt )
   write( protocol ~= "" and protocol.."://" or "" )
@@ -66,16 +102,42 @@ end
 
 function getInput()
   local input = (protocol ~= "" and protocol.."://" or "").. (url ~= "" and url or "")
-  term.setCursorBlink( true )
+  local oldInput = ""
+  local list = {}
+  local num = 0
+
   while true do
-    term.setCursorPos( 7,10 )
+    term.setCursorPos( 7,9 )
     term.setBackgroundColor( c.mainbg )
     term.clearLine()
     term.setBackgroundColor( c.inputbg )
-    dvg.center( "                                         ", 10 )
-    term.setCursorPos( 7,10 )
+    dvg.center( "                                         ", 9 )
+    term.setCursorPos( 7,9 )
     write( input )
+
+    if input ~= "" and rwSettings.liveSearch.val then
+      if input ~= oldInput then
+        rednet.broadcast( input, "DVG_REDWEB_IDS_SEARCH_REQUEST" )
+        _, list = receive( "DVG_REDWEB_IDS_SEARCH_ANSWER", 0.1 )
+      end
+      term.setTextColor( c.sinputtxt )
+      for i = 1, 5 do
+        if list and list[i] then term.setBackgroundColor( c.inputbg ) else term.setBackgroundColor( c.mainbg ) end
+        dvg.center( dvg.fill( " "..(list[i] and list[i] or ""), 40 ), 9+i )
+      end
+      term.setTextColor( c.inputtxt )
+    elseif rwSettings.liveSearch.val then
+      term.setBackgroundColor( c.mainbg )
+      for i = 1, 5 do
+        dvg.center( string.rep(" ", 41), 9+i )
+      end
+    end -- End if input ~= ""
+
+    oldInput = input
+    term.setCursorBlink( true )
     input, enterPressed, continue, event, param = dvg.read( input, "mouse_click" )
+    term.setCursorBlink( false )
+
     if event == "timer" then
       for i, v in ipairs( error ) do
         if v.timer == param[1] then
@@ -89,11 +151,13 @@ function getInput()
         end -- End if v.timer finished
       end -- End for
     end -- End if timer
+
     if not continue then
-      term.setCursorBlink( false )
+      os.queueEvent( event, unpack(param) )
       return input, enterPressed
     end
   end -- End while true
+
 end
 
 function handleInput( input )
@@ -159,20 +223,20 @@ while running do
     local event, button, x, y = os.pullEvent()
 
     if event == "mouse_click" then
-      if y == 14 and x >= 18 and x <= 21 then
+      if y == 16 and x >= 18 and x <= 21 then
         running = false
         term.setBackgroundColor( colors.black )
         term.clear()
         term.setCursorPos( 1,1 )
-      elseif y == 14 and x >= 27 and x <= 34 then
+      elseif y == 16 and x >= 27 and x <= 34 then
         shell.run( path.."/settings" )
         local file = fs.open( path.."/settings.cfg", "r" ) -- Open settings and save in global var
         _G["rwSettings"] = textutils.unserialize( file.readAll() )
         file.close()
-      elseif y == 10 and x >= 6 and x <= 46 then
-        term.setCursorPos( 7,10 )
+      elseif y == 9 and x >= 6 and x <= 46 then
+        term.setCursorPos( 7,8 )
         dvg.printColor( (protocol ~= "" and protocol.."://" or "") .. (url ~= "" and url or ""), c.sinputtxt )
-        term.setCursorPos( 7,10 )
+        term.setCursorPos( 7,8 )
         term.setTextColor( c.inputtxt )
         local input, enterPressed = getInput()
         if enterPressed then
