@@ -204,7 +204,7 @@ if not dvgapps then
   os.reboot()
 end
 local success, msg = dvg.openRednet()
-if not success then errors( msg ) end
+if not success then error( msg ) end
 
 local file = fs.open( path.."/settings.cfg", "r" ) -- Open settings and save in global var
 _G["rwSettings"] = textutils.unserialize( file.readAll() )
