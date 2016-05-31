@@ -8,8 +8,8 @@
       - Advanced computer
       - IDS and webserver
 
-      VERSION  0.9.14.1
-      DATE     18-05-2016
+      VERSION  0.9.14.3
+      DATE     31-05-2016
 
       Protocols:
       - app://
@@ -35,7 +35,7 @@ local shades = {
   [2] = colors.white,
 }
 
-local error = {}
+local errors = {}
 local protocol = ""
 local url = ""
 local goto = ""
@@ -94,9 +94,9 @@ function mainInterface()
   write( url ~= "" and url or "" )
 
   term.setTextColor( c.errortxt )
-  for i = 1, math.min( #error, 3 ) do
-    term.setBackgroundColor( shades[ error[i].state ] )
-    dvg.center( " "..error[i].txt.." ", 4-i )
+  for i = 1, math.min( #errors, 3 ) do
+    term.setBackgroundColor( shades[ errors[i].state ] )
+    dvg.center( " "..errors[i].txt.." ", 4-i )
   end
 end
 
@@ -139,13 +139,13 @@ function getInput()
     term.setCursorBlink( false )
 
     if event == "timer" then
-      for i, v in ipairs( error ) do
+      for i, v in ipairs( errors ) do
         if v.timer == param[1] then
           v.state = v.state - 1
           if v.state > 0 then
             v.timer = os.startTimer( 0.2 )
           else
-            table.remove( error, i )
+            table.remove( errors, i )
           end
           break
         end -- End if v.timer finished
@@ -170,7 +170,7 @@ function handleInput( input )
     local goto, status = rw.doWebpage( webpage )
     if status == false then
       if #goto > 0 then
-        table.insert(  error, 1, { txt = goto, timer = os.startTimer(tonumber(rwSettings.errorTime.val)), state = 2 }  )
+        table.insert(  errors, 1, { txt = goto, timer = os.startTimer(tonumber(rwSettings.errorTime.val)), state = 2 }  )
       end
       return ""
     else
@@ -178,7 +178,7 @@ function handleInput( input )
     end
   else
     if #webpage > 0 then
-      table.insert(  error, 1, { txt = webpage, timer = os.startTimer(tonumber(rwSettings.errorTime.val)), state = 2 }  )
+      table.insert(  errors, 1, { txt = webpage, timer = os.startTimer(tonumber(rwSettings.errorTime.val)), state = 2 }  )
     end
     return ""
   end -- End if success
@@ -203,16 +203,17 @@ if not dvgapps then
   end
   os.reboot()
 end
-dvg.openRednet()
+local success, msg = dvg.openRednet()
+if not success then errors( msg ) end
 
 local file = fs.open( path.."/settings.cfg", "r" ) -- Open settings and save in global var
 _G["rwSettings"] = textutils.unserialize( file.readAll() )
 file.close()
 
 while running do
-  for i = #error, 1, -1 do
-    if error[i].state <= 0 then
-      table.remove( error, i )
+  for i = #errors, 1, -1 do
+    if errors[i].state <= 0 then
+      table.remove( errors, i )
     end
   end
   if goto and goto ~= "" then
@@ -245,7 +246,7 @@ while running do
       end -- End if y
 
     elseif event == "timer" then
-      for i, v in ipairs( error ) do
+      for i, v in ipairs( errors ) do
         if v.timer == button then
           v.state = v.state - 1
           if v.state > 0 then
